@@ -2,7 +2,7 @@
 
 namespace Identity_JwtToken.Models;
 
-public class AppUser:IdentityUser
+public class AppUser : IdentityUser
 {
 
 }

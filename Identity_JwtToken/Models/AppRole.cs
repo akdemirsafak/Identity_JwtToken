@@ -2,6 +2,6 @@
 
 namespace Identity_JwtToken.Models;
 
-public class AppRole:IdentityRole
+public class AppRole : IdentityRole
 {
 }

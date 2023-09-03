@@ -8,7 +8,7 @@ namespace Identity_JwtToken.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class BookController:ControllerBase
+public class BookController : ControllerBase
 {
     private readonly BookDbContext _dbContext;
 
@@ -32,6 +32,14 @@ public class BookController:ControllerBase
             Price= request.Price
         };
         await _dbContext.Books.AddAsync(entity);
+        await _dbContext.SaveChangesAsync();
+        return Ok();
+    }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var entity= await _dbContext.Books.FindAsync(id);
+        _dbContext.Books.Remove(entity);
         await _dbContext.SaveChangesAsync();
         return Ok();
     }
