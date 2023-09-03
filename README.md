@@ -11,10 +11,10 @@ Using Packages and anothers:
 
 ### Another 
 
-Options Pattern
-Dependency Inversion with DI Container
-**RefreshTokens**
-Helpers
-Record Request's, Response classes
-UserManager, RoleManager
+- Options Pattern
+- Dependency Inversion with DI Container
+- **RefreshTokens**
+- Helpers
+- Record Request's, Response classes
+- UserManager, RoleManager
 
