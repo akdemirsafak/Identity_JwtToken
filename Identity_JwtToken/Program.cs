@@ -1,11 +1,24 @@
+using Identity_JwtToken.DbContext;
+using Identity_JwtToken.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<BookDbContext>(x =>
+{
+    x.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection"),
+        option => { option.MigrationsAssembly(Assembly.GetAssembly(typeof(BookDbContext))!.GetName().Name); });
+});
+
+builder.Services.AddIdentity<AppUser, AppRole>()
+.AddEntityFrameworkStores<BookDbContext>()
+.AddDefaultTokenProviders();
 
 var app = builder.Build();
 
@@ -17,6 +30,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
