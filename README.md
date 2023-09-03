@@ -8,3 +8,13 @@ Using Packages and anothers:
 4. Microsoft.EntityFrameworkCore.Design
 5. Microsoft.EntityFrameworkCore.SqlServer
 6. Microsoft.EntityFrameworkCore.Tools
+
+### Another 
+
+Options Pattern
+Dependency Inversion with DI Container
+**RefreshTokens**
+Helpers
+Record Request's, Response classes
+UserManager, RoleManager
+
