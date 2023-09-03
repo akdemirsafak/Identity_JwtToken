@@ -11,6 +11,7 @@ public class BookDbContext : IdentityDbContext<AppUser, AppRole, string>
     }
 
     public DbSet<AppUser> Users { get; set; }
+    public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
     public DbSet<AppRole> Roles { get; set; }
     public DbSet<Book> Books { get; set; }
 }

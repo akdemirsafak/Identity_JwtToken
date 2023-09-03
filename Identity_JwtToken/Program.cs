@@ -1,8 +1,14 @@
+using Identity_JwtToken.AuthenticationOperations;
 using Identity_JwtToken.DbContext;
+using Identity_JwtToken.Helper;
 using Identity_JwtToken.Models;
+using Identity_JwtToken.TokenOperations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +25,35 @@ builder.Services.AddDbContext<BookDbContext>(x =>
 builder.Services.AddIdentity<AppUser, AppRole>()
 .AddEntityFrameworkStores<BookDbContext>()
 .AddDefaultTokenProviders();
+
+
+
+var tokenOptions = builder.Configuration.GetSection("TokenOptions").Get<Identity_JwtToken.TokenOperations.TokenOptions>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidIssuer = tokenOptions!.Issuer,
+        ValidAudience = tokenOptions.Audience,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenOptions.SecurityKey))
+    };
+});
+
+
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+
+builder.Services.Configure<Identity_JwtToken.TokenOperations.TokenOptions>(builder.Configuration.GetSection("TokenOptions"));
 
 var app = builder.Build();
 

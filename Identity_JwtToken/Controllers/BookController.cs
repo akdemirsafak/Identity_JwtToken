@@ -1,8 +1,11 @@
 ﻿using Identity_JwtToken.DbContext;
+using Identity_JwtToken.Helper;
 using Identity_JwtToken.Models;
 using Identity_JwtToken.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Identity_JwtToken.Controllers;
 
@@ -11,10 +14,11 @@ namespace Identity_JwtToken.Controllers;
 public class BookController : ControllerBase
 {
     private readonly BookDbContext _dbContext;
-
-    public BookController(BookDbContext dbContext)
+    private readonly ICurrentUser _currentUser;
+    public BookController(BookDbContext dbContext, ICurrentUser currentUser)
     {
         _dbContext = dbContext;
+        _currentUser = currentUser;
     }
 
     [HttpGet]
@@ -23,13 +27,15 @@ public class BookController : ControllerBase
         return Ok(await _dbContext.Books.ToListAsync());
     }
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> Add([FromBody] AddBookRequest request)
     {
         var entity= new Book()
         {
             Name= request.Name,
             Description= request.Description,
-            Price= request.Price
+            Price= request.Price,
+            CreatedBy=new Guid(HttpContext.User.FindFirstValue(claimType:ClaimTypes.NameIdentifier))
         };
         await _dbContext.Books.AddAsync(entity);
         await _dbContext.SaveChangesAsync();
