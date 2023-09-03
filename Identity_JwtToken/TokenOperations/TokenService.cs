@@ -1,4 +1,5 @@
 ﻿using Identity_JwtToken.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,10 +12,12 @@ namespace Identity_JwtToken.TokenOperations;
 public class TokenService : ITokenService
 {
     private readonly TokenOptions _tokenOptions;
+    private readonly UserManager<AppUser> _userManager;
 
-    public TokenService(IOptions<TokenOptions> tokenOptions)
+    public TokenService(IOptions<TokenOptions> tokenOptions, UserManager<AppUser> userManager)
     {
         _tokenOptions = tokenOptions.Value;
+        _userManager = userManager;
     }
 
     public TokenDto CreateToken(AppUser appUser)
@@ -27,10 +30,10 @@ public class TokenService : ITokenService
 
         var jwtSecurityToken = new JwtSecurityToken(
             issuer:_tokenOptions.Issuer,
-            audience: _tokenOptions.Audience,
+            //audience: _tokenOptions.Audience,
             expires: accessTokenExpiration,
             notBefore: DateTime.Now,
-            claims: GetClaims(appUser),
+            claims: GetClaims(appUser,_tokenOptions.Audience),
             signingCredentials: signingCredentials);
 
         var handler = new JwtSecurityTokenHandler();
@@ -52,8 +55,9 @@ public class TokenService : ITokenService
         rnd.GetBytes(numberByte);
         return Convert.ToBase64String(numberByte);
     }
-    private IEnumerable<Claim> GetClaims(AppUser appUser)
+    private  IEnumerable<Claim> GetClaims(AppUser appUser, List<String> audiences)
     {
+        var roles= _userManager.GetRolesAsync(appUser).Result;
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, appUser.Id),
@@ -61,6 +65,9 @@ public class TokenService : ITokenService
             new(ClaimTypes.Name, appUser.UserName),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+        claims.AddRange(audiences.Select(x => new Claim(JwtRegisteredClaimNames.Aud, x)));
+        claims.AddRange(roles.Select(x => new Claim(ClaimTypes.Role, x)));
+
 
         return claims;
     }

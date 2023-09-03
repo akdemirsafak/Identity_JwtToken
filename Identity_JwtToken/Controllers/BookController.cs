@@ -5,7 +5,6 @@ using Identity_JwtToken.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace Identity_JwtToken.Controllers;
 
@@ -35,15 +34,17 @@ public class BookController : ControllerBase
             Name= request.Name,
             Description= request.Description,
             Price= request.Price,
-            CreatedBy=new Guid(HttpContext.User.FindFirstValue(claimType:ClaimTypes.NameIdentifier))
+            CreatedBy=new Guid(_currentUser.GetUserId)
         };
         await _dbContext.Books.AddAsync(entity);
         await _dbContext.SaveChangesAsync();
         return Ok();
     }
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
+        
         var entity= await _dbContext.Books.FindAsync(id);
         _dbContext.Books.Remove(entity);
         await _dbContext.SaveChangesAsync();

@@ -42,7 +42,7 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidIssuer = tokenOptions!.Issuer,
-        ValidAudience = tokenOptions.Audience,
+        ValidAudience = tokenOptions.Audience[0],
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenOptions.SecurityKey))
     };

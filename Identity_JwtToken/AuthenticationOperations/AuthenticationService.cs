@@ -67,5 +67,9 @@ public class AuthenticationService : IAuthenticationService
             UserName = request.UserName
         };
         var identityResult= await _userManager.CreateAsync(entity,request.Password);
+        if (identityResult.Succeeded)
+        {
+           var addtoRole= await _userManager.AddToRoleAsync(entity, "Standart");
+        }
     }
 }

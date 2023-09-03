@@ -1,4 +1,6 @@
-﻿namespace Identity_JwtToken.Helper;
+﻿using System.Security.Claims;
+
+namespace Identity_JwtToken.Helper;
 
 public class CurrentUser : ICurrentUser
 {
@@ -9,5 +11,9 @@ public class CurrentUser : ICurrentUser
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public string GetUserId => _httpContextAccessor.HttpContext.User.FindFirst("Id")?.Value;
+    public string GetUserId => _httpContextAccessor.HttpContext.User.FindFirstValue(claimType:ClaimTypes.NameIdentifier);
+    public string GetUserName => _httpContextAccessor.HttpContext.User.FindFirstValue(claimType:ClaimTypes.Name);
+    public string GetEmail => _httpContextAccessor.HttpContext.User.FindFirstValue(claimType:ClaimTypes.Email);
+
+    
 }
